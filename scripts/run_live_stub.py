@@ -72,8 +72,7 @@ def main():
     print(f"final state after restart matches the uninterrupted run: {matches}")
 
     section("5. Alerting: backtest-vs-live deviation check")
-    # a realistic (costed) backtest is expected to underperform the costless
-    # live-stub run , that's a known, explainable gap, not a bug
+    # a realistic (costed) backtest is expected to underperform the costless live-stub run 
     realistic_bt_strategy = GridStrategy("grid-demo", GridConfig())
     realistic_bt_blotter = Blotter()
     run(realistic_bt_strategy, BacktestAdapter(bars, slippage_bps=5, commission_per_order=1.0),
@@ -84,8 +83,7 @@ def main():
     print(f"tight tolerance (0.01): alert fired = {breached_tight}  <- expected, cost model differs")
 
     # over a long enough run, cost-driven fill-price differences can push a
-    # trigger onto a different bar entirely -- find how far the two trade
-    # sequences agree before that happens, rather than assuming they always will
+    # trigger onto a different bar entirely 
     costed_reasons = [(r.bar_index, r.reason) for r in realistic_bt_blotter.rows]
     live_reasons = [(r.bar_index, r.reason) for r in live_blotter.rows]
     agree_upto = 0

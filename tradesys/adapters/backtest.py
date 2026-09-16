@@ -6,7 +6,7 @@ from .base import Fill
 class BacktestAdapter:
     """Fills at the NEXT bar's open , an order decided using bar i's close
     cannot execute inside bar i, it wasn't over yet when the decision was
-    made. Slippage and commission are modelled explicitly here, nowhere else."""
+    made. Slippage and commissions(assuming ) are modelled explicitly here ."""
 
     def __init__(self, bars: BarSeries, slippage_bps: float = 0.0, commission_per_order: float = 0.0):
         self.bars = bars
