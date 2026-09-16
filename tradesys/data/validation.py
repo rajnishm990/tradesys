@@ -6,7 +6,7 @@ class TickValidator:
 
     def __init__(self, max_jump_pct: float=0.2):
         self.max_jump_pct = max_jump_pct 
-        self.last_price = {} 
+        self._last_price = {} 
 
     def validate(self , tick) -> Optional[str]:
         if tick.last_price <= 0:

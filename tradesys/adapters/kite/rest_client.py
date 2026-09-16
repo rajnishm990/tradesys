@@ -3,7 +3,7 @@ import time
 import random
 import logging
 from .transport import UrllibTransport
-from .rest_errors import RetriableError, AmbiguousError, FatalError
+from .rest_errors import RetriableError, AmbigousError, FatalError
 
 log = logging.getLogger("tradesys.kite_rest")
 KITE_BASE_URL = "https://api.kite.trade"
@@ -37,7 +37,7 @@ class KiteRestClient:
             attempt += 1
             try:
                 resp = self.transport.send(method, url, self._headers(), params)
-            except AmbiguousError:
+            except AmbigousError:
                 log.warning("AMBIGUOUS_RESPONSE", extra={"attempt": attempt, "tag": idempotent_tag})
                 existing = self.reconcile_fn(idempotent_tag) if self.reconcile_fn else None
                 if existing:
