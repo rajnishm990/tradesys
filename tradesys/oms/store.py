@@ -3,10 +3,7 @@ from ..strategy.grid import Order
 
 
 class OrderStore:
-    """The system's durable memory of what it has actually done. An order
-    intent is written here BEFORE it is sent to an adapter; a crash-and-retry
-    replays the same client_order_id and record_intent reports 'already done'
-    instead of letting a duplicate order through."""
+    """Order INtent is written here before being sent to adapter . This helps us in idempotency .. Our Engine first checks OMS to see if order Id existws or not."""
 
     def __init__(self, path: str = ":memory:"):
         self.conn = sqlite3.connect(path)

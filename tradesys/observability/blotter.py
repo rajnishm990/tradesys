@@ -13,8 +13,7 @@ class BlotterRow:
 
 
 class Blotter:
-    """trade ledger  plus a
-    mark-to-market series for an equity curve."""
+    """trade ledger  plus a mark-to-market series for an equity curve."""
 
     def __init__(self):
         self.rows = []
@@ -39,7 +38,7 @@ class Blotter:
 
 
 def compute_realized_pnl(rows) -> float:
-    """The one P&L accumulator -- Blotter.realized_pnl and any test or
+    """ P&L accumulator , Blotter.realized_pnl and any test or
     report that needs realized P&L over a subset of rows both call this,
     so there is exactly one place the round-trip math can be wrong."""
     pnl, running_qty, running_cost = 0.0, 0, 0.0

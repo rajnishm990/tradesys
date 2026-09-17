@@ -13,8 +13,7 @@ def make_client_order_id(strategy_id: str, seq: int) -> str:
     return hashlib.sha256(f"{strategy_id}:{seq}".encode()).hexdigest()[:16]
 
 
-def run(strategy: GridStrategy, adapter, bars: BarSeries, store: OrderStore,
-        blotter: Blotter, start_index: int = 0) -> None:
+def run(strategy: GridStrategy, adapter, bars: BarSeries, store: OrderStore,blotter: Blotter, start_index: int = 0) -> None:
     """The one loop both the backtest and the live path run through.
     Every order is durably recorded before it is submitted, so replaying
     already-processed bars after a restart is a no-operation, not a duplicate."""

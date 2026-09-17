@@ -8,7 +8,7 @@ from tradesys.engine.runner import run
 
 
 def test_zero_cost_backtest_and_live_stub_produce_identical_fills():
-    """The core architectural claim: strategy decisions and fills depend
+    """strategy decisions and fills depend
     only on the shared engine + strategy, never on which adapter drives
     them. With the cost model zeroed out there is nothing left to explain
     a difference, so the two runs must match fill-for-fill."""
@@ -28,7 +28,7 @@ def test_zero_cost_backtest_and_live_stub_produce_identical_fills():
 
 def test_realistic_cost_run_is_worse_than_zero_cost_by_exactly_the_modelled_cost():
     """With costs turned on, the backtest must underperform the zero-cost
-    run by precisely the cost paid -- if it doesn't, some cost is being
+    run by precisely the cost paid , if it doesn't, some cost is being
     applied (or double-applied) somewhere the model doesn't account for."""
     bars = generate_synthetic_bars(n_bars=80, seed=5, vol=0.01)
 
@@ -41,8 +41,8 @@ def test_realistic_cost_run_is_worse_than_zero_cost_by_exactly_the_modelled_cost
         bars, OrderStore(), costed)
 
     # Same trade count/reasons expected at this cost level (small slippage,
-    # short series) -- if this assert ever fails it means cost drift pushed
-    # a trigger onto a different bar, which is a real and useful thing to know.
+    # short series) , if this assert ever fails it means cost drift pushed
+    # a trigger onto a different bar.
     assert [(r.bar_index, r.reason) for r in cheap.rows] == [(r.bar_index, r.reason) for r in costed.rows]
 
     # Only compare over CLOSED round trips: an open tail position carries

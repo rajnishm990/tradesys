@@ -37,7 +37,7 @@ class ContractMaster:
             self._master[sym].sort(key=lambda x: x.expiry)
 
     def get_active_contract(self, base_symbol: str, as_of: date) -> Optional[Instrument]:
-        """Returns the current front-month contract."""
+        
         chain = self._master.get(base_symbol, [])
         valid = [inst for inst in chain if inst.expiry >= as_of]
         return valid[0] if valid else None

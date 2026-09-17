@@ -5,10 +5,6 @@ from tradesys.oms.store import OrderStore
 from tradesys.observability.blotter import Blotter
 from tradesys.engine.runner import run
 
-# Golden master, captured from an actual run on seed=1 and pinned here.
-# Any change to ATR, the grid trigger logic, or fill timing that alters
-# this sequence must be a deliberate, reviewed strategy change -- that is
-# what "every strategy change ships with a regression test" means in practice.
 EXPECTED_TRADES = [
     (13, "BUY", "ENTRY", 104.018),
     (14, "BUY", "ADD", 101.7664),

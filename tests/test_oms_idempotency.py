@@ -14,7 +14,7 @@ def test_duplicate_intent_is_a_no_op():
     coid = make_client_order_id("s", 1)
     assert store.record_intent(coid, order, bar_index=0) is True
     # simulates a crash right after send, then a naive retry re-submitting
-    # the identical intent -- must be rejected, not double-counted
+    # the identical intent , must be rejected, not double-counted
     assert store.record_intent(coid, order, bar_index=0) is False
     assert store.count_orders() == 1
 

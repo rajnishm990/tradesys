@@ -12,8 +12,7 @@ class Bar:
 
 
 class BarSeries:
-    """Holds the full bar history but only ever hands out a prefix.
-    A strategy fed 'window(i)' physically cannot see bar i+1 onward """
+    """ Holds the bar series .. no lookahead """
 
     def __init__(self, bars: Sequence[Bar]):
         self._bars = list(bars)
