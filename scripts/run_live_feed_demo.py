@@ -10,7 +10,7 @@ from tradesys.data.tick_codec import encode_message, encode_ltp_packet, split_pa
 
 
 class FlakyTransport:
-    """Fails twice with a 502, then succeeds -- simulates a broker having
+    """Fails twice with a 502, then succeeds , simulates a broker having
     a bad few seconds, which is the normal case retry/backoff exists for."""
     def __init__(self):
         self.calls = 0
@@ -22,7 +22,7 @@ class FlakyTransport:
 
 
 def section(t):
-    print(f"\n--- {t} ---")
+    print(f"\n- - -  {t} - - - ")
 
 
 def main():

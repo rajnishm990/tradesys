@@ -16,7 +16,7 @@ OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "artifacts")
 
 
 def section(title):
-    print(f"\n--- {title} ---")
+    print(f"\n- - - - {title} - - - ")
 
 
 def main():
