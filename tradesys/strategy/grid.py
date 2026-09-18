@@ -31,6 +31,28 @@ class GridConfig:
     max_lots: int = 5
     lot_size: int = 1
 
+
+def apply_fill(lots: int, avg_entry: Optional[float], last_entry_price: Optional[float],
+               side: OrderSide, fill_lots: int, fill_price: float):
+    """Position arithmetic for one fill, shared by GridStrategy.on_fill and
+    OrderStore.reconciled_position so a restart rebuilds exactly the state the
+    live process had. Positive lots = long, negative = short.
+
+    Returns (lots, avg_entry, last_entry_price)."""
+    signed = fill_lots if side == OrderSide.BUY else -fill_lots
+    closing = (lots > 0 and signed < 0 and -signed >= lots) or \
+              (lots < 0 and signed > 0 and signed >= -lots)
+    if closing:
+        new_lots = lots + signed
+        if new_lots == 0:
+            return 0, None, None
+        # Stop-and-reverse: the surplus opens a fresh position at the fill price
+        return new_lots, fill_price, fill_price
+    total_cost = (avg_entry or 0.0) * abs(lots) + fill_price * abs(signed)
+    new_lots = lots + signed
+    return new_lots, total_cost / abs(new_lots), fill_price
+
+
 class GridStrategy:
     """
     Bidirectional ATR-spaced grid with Stop-and-Reverse (SAR).
@@ -108,26 +130,6 @@ class GridStrategy:
         return []
 
     def on_fill(self, order: Order, fill_price: float) -> None:
-        # Standardize order size mathematically
-        fill_qty = order.qty // self.config.lot_size
-        fill_qty_signed = fill_qty if order.side == OrderSide.BUY else -fill_qty
-
-        # If flattening or reversing the position
-        if (self.lots > 0 and fill_qty_signed < 0 and abs(fill_qty_signed) >= self.lots) or \
-           (self.lots < 0 and fill_qty_signed > 0 and fill_qty_signed >= abs(self.lots)):
-            
-            new_lots = self.lots + fill_qty_signed
-            if new_lots == 0:
-                self.lots = 0
-                self.avg_entry = None
-                self.last_entry_price = None
-            else:
-                self.lots = new_lots
-                self.avg_entry = fill_price
-                self.last_entry_price = fill_price
-        else:
-            # Adding to existing position
-            total_cost = (self.avg_entry or 0.0) * abs(self.lots) + fill_price * abs(fill_qty_signed)
-            self.lots += fill_qty_signed
-            self.avg_entry = total_cost / abs(self.lots)
-            self.last_entry_price = fill_price
+        fill_lots = order.qty // self.config.lot_size
+        self.lots, self.avg_entry, self.last_entry_price = apply_fill(
+            self.lots, self.avg_entry, self.last_entry_price, order.side, fill_lots, fill_price)
