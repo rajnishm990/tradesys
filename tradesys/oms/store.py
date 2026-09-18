@@ -1,5 +1,5 @@
 import sqlite3
-from ..strategy.grid import Order
+from ..strategy.grid import Order, OrderSide, apply_fill
 
 
 class OrderStore:
@@ -38,21 +38,19 @@ class OrderStore:
     def count_orders(self) -> int:
         return self.conn.execute("SELECT COUNT(*) FROM orders").fetchone()[0]
 
-    def reconciled_position(self):
+    def reconciled_position(self, lot_size: int = 1):
         """Rebuilds lots / avg entry / last entry purely from durable fills.
         Used on restart instead of trusting whatever was in memory when
-        the process died -- this is 'position and P&L truth'."""
+        the process died -- this is 'position and P&L truth'.
+
+        Replays every fill through the same apply_fill() the strategy uses,
+        so longs, shorts and stop-and-reverse flips all reconcile."""
         rows = self.conn.execute(
             "SELECT o.side, f.qty, f.price FROM orders o JOIN fills f "
-            "ON o.client_order_id = f.client_order_id ORDER BY f.ts"
+            "ON o.client_order_id = f.client_order_id ORDER BY f.ts, o.bar_index, o.rowid"
         ).fetchall()
         lots, avg_entry, last_entry = 0, None, None
         for side, qty, price in rows:
-            if side == "BUY":
-                total = (avg_entry or 0.0) * lots + price * qty
-                lots += qty
-                avg_entry = total / lots
-                last_entry = price
-            else:
-                lots, avg_entry, last_entry = 0, None, None
+            lots, avg_entry, last_entry = apply_fill(
+                lots, avg_entry, last_entry, OrderSide(side), qty // lot_size, price)
         return lots, avg_entry, last_entry
