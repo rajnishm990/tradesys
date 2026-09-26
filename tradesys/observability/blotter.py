@@ -40,15 +40,26 @@ class Blotter:
 def compute_realized_pnl(rows) -> float:
     """ P&L accumulator , Blotter.realized_pnl and any test or
     report that needs realized P&L over a subset of rows both call this,
-    so there is exactly one place the round-trip math can be wrong."""
-    pnl, running_qty, running_cost = 0.0, 0, 0.0
+    so there is exactly one place the round-trip math can be wrong.
+
+    Position is signed (BUY +qty, SELL -qty). A fill in the direction of
+    the open position adds at a new average cost; a fill against it realizes
+    P&L on the units closed. A stop-and-reverse closes everything and opens
+    the surplus at the fill price."""
+    pnl, pos, avg = 0.0, 0, 0.0
     for r in rows:
-        if r.side == "BUY":
-            running_cost += r.price * r.qty
-            running_qty += r.qty
+        signed = r.qty if r.side == "BUY" else -r.qty
+        if pos == 0 or (pos > 0) == (signed > 0):
+            avg = (avg * abs(pos) + r.price * abs(signed)) / (abs(pos) + abs(signed))
+            pos += signed
         else:
-            avg = running_cost / running_qty if running_qty else 0.0
-            pnl += (r.price - avg) * r.qty
-            running_qty, running_cost = 0, 0.0
+            closed = min(abs(pos), abs(signed))
+            pnl += (r.price - avg) * closed * (1 if pos > 0 else -1)
+            new_pos = pos + signed
+            if new_pos == 0:
+                avg = 0.0
+            elif (new_pos > 0) != (pos > 0):
+                avg = r.price
+            pos = new_pos
         pnl -= r.cost
     return pnl
