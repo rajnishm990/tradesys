@@ -13,8 +13,8 @@ class MarketRegime(Enum):
 class RegimePolicy:
     regime: MarketRegime 
     grid_spacing_multiplier: float 
-    max_pyramiding_levels = int 
-    allow_new_entries = bool 
+    max_pyramiding_levels : int 
+    allow_new_entries : bool 
     force_liquidation: bool 
 
 
